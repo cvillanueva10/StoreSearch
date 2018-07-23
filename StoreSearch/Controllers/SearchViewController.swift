@@ -12,13 +12,28 @@ class SearchViewController: UIViewController {
 
     // MARK: - properties
 
-    let searchBar: UISearchBar = {
+    private let searchBar: UISearchBar = {
         let bar = UISearchBar()
         bar.placeholder = "App name, artist, song, album, e-book"
         bar.translatesAutoresizingMaskIntoConstraints = false
         return bar
     }()
-    let searchTableView: UITableView = {
+    private let searchSegmentedControl: UISegmentedControl = {
+        let control = UISegmentedControl()
+        control.insertSegment(withTitle: "All", at: 0, animated: true)
+        control.insertSegment(withTitle: "Music", at: 1, animated: true)
+        control.insertSegment(withTitle: "Software", at: 2, animated: true)
+        control.insertSegment(withTitle: "E-books", at: 3, animated: true)
+        control.translatesAutoresizingMaskIntoConstraints = false
+        return control
+    }()
+    private let separatorView: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor(white: 0, alpha: 0.4)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    private let searchTableView: UITableView = {
         let tableView = UITableView()
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
@@ -29,6 +44,7 @@ class SearchViewController: UIViewController {
     var searchResults = [SearchResult]()
     var hasSearched = false
     var isLoading = false
+    var dataTask: URLSessionDataTask?
 
     // MARK: - lifecycle
 
@@ -37,9 +53,18 @@ class SearchViewController: UIViewController {
         setupUI()
     }
 
-    func iTunesURL(searchTerm: String) -> URL {
+    // MARK: - networking
+
+    func iTunesURL(searchTerm: String, category: Int) -> URL {
+        let kind: String
+        switch category {
+        case 1: kind = "musicTrack"
+        case 2: kind = "software"
+        case 3: kind = "ebook"
+        default: kind = ""
+        }
         let encodedTerm = searchTerm.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
-        let urlString = String(format: "https://itunes.apple.com/search?term=%@&limit=200", encodedTerm)
+        let urlString = "https://itunes.apple.com/search?term=\(encodedTerm)&limit=200&entity=\(kind)"
         return URL(string: urlString)!
     }
 
@@ -54,53 +79,20 @@ class SearchViewController: UIViewController {
         }
     }
 
-    func showNetworkError() {
-        let alert = UIAlertController(title: "Whoops...", message: "There was an error accessing the iTunes store." +
-            " Please try again.", preferredStyle: .alert)
-        let action = UIAlertAction(title: "OK", style: .default, handler: nil)
-        alert.addAction(action)
-        present(alert, animated: true, completion: nil)
-    }
 
-    // MARK: - UI
-
-    private func setupUI() {
-        searchBar.becomeFirstResponder()
-        searchTableView.register(LoadingCell.self, forCellReuseIdentifier: loadingCellID)
-        searchTableView.register(SearchTableViewCell.self, forCellReuseIdentifier: searchResultCellID)
-        searchTableView.register(NothingFoundCell.self, forCellReuseIdentifier: nothingFoundCellID)
-        view.backgroundColor = .white
-        view.addSubview(searchBar)
-        searchBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
-        searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        searchBar.delegate = self
-        view.addSubview(searchTableView)
-        searchTableView.topAnchor.constraint(equalTo: searchBar.bottomAnchor).isActive = true
-        searchTableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
-        searchTableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
-        searchTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
-        searchTableView.dataSource = self
-        searchTableView.delegate = self
-    }
-}
-
-// MARK: - search bar delegate methods
-
-extension SearchViewController : UISearchBarDelegate {
-
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+    @objc func performSearch() {
         guard let searchText = searchBar.text, !searchText.isEmpty else { return }
         searchBar.resignFirstResponder()
+        dataTask?.cancel()
         isLoading = true
         searchTableView.reloadData()
         hasSearched = true
         searchResults = []
-        let url = iTunesURL(searchTerm: searchText)
+        let url = iTunesURL(searchTerm: searchText, category: searchSegmentedControl.selectedSegmentIndex)
         let session = URLSession.shared
-        let dataTask = session.dataTask(with: url) { (data, response, error) in
-            if let error = error {
-                print("Failure! \(error.localizedDescription)")
+        dataTask = session.dataTask(with: url) { (data, response, error) in
+            if let error = error as NSError?, error.code == -999 {
+                return
             } else if let httpResponse = response as? HTTPURLResponse,
                 httpResponse.statusCode == 200 {
                 if let data = data {
@@ -122,7 +114,56 @@ extension SearchViewController : UISearchBarDelegate {
                 self.showNetworkError()
             }
         }
-        dataTask.resume()
+        dataTask?.resume()
+    }
+
+    func showNetworkError() {
+        let alert = UIAlertController(title: "Whoops...", message: "There was an error accessing the iTunes store." +
+            " Please try again.", preferredStyle: .alert)
+        let action = UIAlertAction(title: "OK", style: .default, handler: nil)
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
+    }
+
+    // MARK: - UI
+
+    private func setupUI() {
+        view.backgroundColor = UIColor(white: 1, alpha: 0.95)
+        searchBar.becomeFirstResponder()
+        searchTableView.register(LoadingCell.self, forCellReuseIdentifier: loadingCellID)
+        searchTableView.register(SearchResultCell.self, forCellReuseIdentifier: searchResultCellID)
+        searchTableView.register(NothingFoundCell.self, forCellReuseIdentifier: nothingFoundCellID)
+        view.addSubview(searchBar)
+        searchBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+        searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        searchBar.delegate = self
+        view.addSubview(searchSegmentedControl)
+        searchSegmentedControl.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 8).isActive = true
+        searchSegmentedControl.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        searchSegmentedControl.widthAnchor.constraint(equalToConstant: 300).isActive = true
+        searchSegmentedControl.addTarget(self, action: #selector(performSearch), for: .valueChanged)
+        view.addSubview(searchTableView)
+        searchTableView.topAnchor.constraint(equalTo: searchSegmentedControl.bottomAnchor, constant: 8).isActive = true
+        searchTableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
+        searchTableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
+        searchTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+        searchTableView.dataSource = self
+        searchTableView.delegate = self
+        view.addSubview(separatorView)
+        separatorView.bottomAnchor.constraint(equalTo: searchTableView.topAnchor).isActive = true
+        separatorView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        separatorView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        separatorView.heightAnchor.constraint(equalToConstant: 1).isActive = true
+    }
+}
+
+// MARK: - search bar delegate methods
+
+extension SearchViewController : UISearchBarDelegate {
+
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        performSearch()
     }
 
     func position(for bar: UIBarPositioning) -> UIBarPosition {
@@ -156,14 +197,9 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
         if searchResults.count == 0 {
             return tableView.dequeueReusableCell(withIdentifier: nothingFoundCellID, for: indexPath) 
         } else {
-            let cell = searchTableView.dequeueReusableCell(withIdentifier: searchResultCellID) as! SearchTableViewCell
+            let cell = searchTableView.dequeueReusableCell(withIdentifier: searchResultCellID) as! SearchResultCell
             let searchResult = searchResults[indexPath.row]
-            cell.topLabel.text = searchResult.name
-            if searchResult.artistName.isEmpty {
-                cell.bottomLabel.text = "Unknown"
-            } else {
-                cell.bottomLabel.text = String(format: "%@ (%@)", searchResult.artistName, searchResult.type)
-            }
+            cell.configure(for: searchResult)
             return cell
         }
     }

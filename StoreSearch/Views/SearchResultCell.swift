@@ -8,7 +8,9 @@
 
 import UIKit
 
-class SearchTableViewCell: UITableViewCell {
+class SearchResultCell: UITableViewCell {
+
+    // MARK: - properties
 
     let topLabel: UILabel = {
         let label = UILabel()
@@ -16,7 +18,6 @@ class SearchTableViewCell: UITableViewCell {
         label.font = .preferredFont(forTextStyle: .title3)
         return label
     }()
-
     let bottomLabel: UILabel = {
         let label = UILabel()
         label.text = "Artist Name"
@@ -24,7 +25,6 @@ class SearchTableViewCell: UITableViewCell {
         label.textColor = UIColor.init(white: 0, alpha: 0.5)
         return label
     }()
-
     let labelStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -34,13 +34,11 @@ class SearchTableViewCell: UITableViewCell {
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
-
     let thumbnailImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "Placeholder")
         return imageView
     }()
-
     let mainStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
@@ -50,13 +48,36 @@ class SearchTableViewCell: UITableViewCell {
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
+    var downloadTask: URLSessionDownloadTask?
+
+    // MARK: - lifecycle
 
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        configureCell()
+        setupViews()
     }
 
-    private func configureCell() {
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        downloadTask?.cancel()
+        downloadTask = nil
+    }
+
+    // MARK: - user interface
+
+    func configure(for result: SearchResult) {
+        topLabel.text = result.name
+        if result.artistName.isEmpty {
+            bottomLabel.text = "Unknown"
+        } else {
+            bottomLabel.text = "\(result.artistName) (\(result.type)"
+        }
+        if let smallUrl = URL(string: result.imageSmall) {
+            downloadTask = thumbnailImageView.loadImage(url: smallUrl)
+        }
+    }
+
+    private func setupViews() {
         let selectedView = UIView(frame: .zero)
         selectedView.backgroundColor = .selectedColor
         selectedBackgroundView = selectedView
