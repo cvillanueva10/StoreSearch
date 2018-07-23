@@ -54,16 +54,6 @@ class SearchViewController: UIViewController {
         }
     }
 
-    func performSearchRequest(with url: URL) -> Data? {
-        do {
-            return try Data(contentsOf: url)
-        } catch {
-            print("Download Error: \(error.localizedDescription)")
-            showNetworkError()
-            return nil
-        }
-    }
-
     func showNetworkError() {
         let alert = UIAlertController(title: "Whoops...", message: "There was an error accessing the iTunes store." +
             " Please try again.", preferredStyle: .alert)
@@ -106,19 +96,33 @@ extension SearchViewController : UISearchBarDelegate {
         searchTableView.reloadData()
         hasSearched = true
         searchResults = []
-        let queue = DispatchQueue.global()
-        queue.async {
-            let url = self.iTunesURL(searchTerm: searchText)
-            if let data = self.performSearchRequest(with: url) {
-                self.searchResults = self.parse(data: data)
-                self.searchResults.sort(by: <)
-                DispatchQueue.main.async {
-                    self.isLoading = false
-                    self.searchTableView.reloadData()
+        let url = iTunesURL(searchTerm: searchText)
+        let session = URLSession.shared
+        let dataTask = session.dataTask(with: url) { (data, response, error) in
+            if let error = error {
+                print("Failure! \(error.localizedDescription)")
+            } else if let httpResponse = response as? HTTPURLResponse,
+                httpResponse.statusCode == 200 {
+                if let data = data {
+                    self.searchResults = self.parse(data: data)
+                    self.searchResults.sort(by: <)
+                    DispatchQueue.main.async {
+                        self.isLoading = false
+                        self.searchTableView.reloadData()
+                    }
+                    return
                 }
-                return
+            } else {
+                print("Failure! \(response!)")
+            }
+            DispatchQueue.main.async {
+                self.hasSearched = false
+                self.isLoading = false
+                self.searchTableView.reloadData()
+                self.showNetworkError()
             }
         }
+        dataTask.resume()
     }
 
     func position(for bar: UIBarPositioning) -> UIBarPosition {
