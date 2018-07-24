@@ -16,6 +16,8 @@
 		5696DFE62102FE57009DEC6D /* NothingFoundCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5696DFE52102FE57009DEC6D /* NothingFoundCell.swift */; };
 		5696DFE821030068009DEC6D /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5696DFE721030068009DEC6D /* Extensions.swift */; };
 		5696DFED2105254C009DEC6D /* LoadingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5696DFEC2105254C009DEC6D /* LoadingCell.swift */; };
+		5696DFF12106190A009DEC6D /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5696DFF02106190A009DEC6D /* DetailViewController.swift */; };
+		5696DFF32106D7C8009DEC6D /* DimmingPresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5696DFF22106D7C8009DEC6D /* DimmingPresentationController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +32,8 @@
 		5696DFE52102FE57009DEC6D /* NothingFoundCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NothingFoundCell.swift; sourceTree = "<group>"; };
 		5696DFE721030068009DEC6D /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		5696DFEC2105254C009DEC6D /* LoadingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingCell.swift; sourceTree = "<group>"; };
+		5696DFF02106190A009DEC6D /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
+		5696DFF22106D7C8009DEC6D /* DimmingPresentationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DimmingPresentationController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,6 +100,8 @@
 			isa = PBXGroup;
 			children = (
 				5696DFD120FF076B009DEC6D /* SearchViewController.swift */,
+				5696DFF02106190A009DEC6D /* DetailViewController.swift */,
+				5696DFF22106D7C8009DEC6D /* DimmingPresentationController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -177,6 +183,8 @@
 				5696DFED2105254C009DEC6D /* LoadingCell.swift in Sources */,
 				5696DFE221000A33009DEC6D /* SearchResult.swift in Sources */,
 				5696DFD020FF076B009DEC6D /* AppDelegate.swift in Sources */,
+				5696DFF12106190A009DEC6D /* DetailViewController.swift in Sources */,
+				5696DFF32106D7C8009DEC6D /* DimmingPresentationController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

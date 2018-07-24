@@ -177,6 +177,8 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        let detailViewController = DetailViewController()
+        present(detailViewController, animated: true, completion: nil)
     }
 
     func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
@@ -213,15 +215,6 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
             return searchResults.count == 0 ? 1 : searchResults.count
         }
     }
-
 }
-
-
-
-
-
-
-
-
 
 
