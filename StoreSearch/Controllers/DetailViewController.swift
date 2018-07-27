@@ -10,6 +10,10 @@ import UIKit
 
 class DetailViewController: UIViewController {
 
+    enum AnimationStyle {
+        case slide
+        case fade
+    }
     let popupView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(white: 1, alpha: 0.95)
@@ -119,6 +123,8 @@ class DetailViewController: UIViewController {
         }
     }
     var downloadTask: URLSessionDownloadTask?
+    var dismissStyle = AnimationStyle.fade
+
 
     // MARK: - lifecycle
 
@@ -134,7 +140,6 @@ class DetailViewController: UIViewController {
     }
 
     deinit {
-        print("Deinit")
         downloadTask?.cancel()
     }
 
@@ -219,6 +224,7 @@ class DetailViewController: UIViewController {
     }
 
     @objc private func handleDismiss() {
+        dismissStyle = .slide
         dismiss(animated: true, completion: nil)
     }
 }
@@ -234,16 +240,24 @@ extension DetailViewController: UIGestureRecognizerDelegate {
 
 extension DetailViewController: UIViewControllerTransitioningDelegate {
 
-    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+    func animationController(forPresented presented: UIViewController,
+                             presenting: UIViewController,
+                             source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         return BounceAnimationController()
     }
     
-    func presentationController(forPresented presented: UIViewController, presenting: UIViewController?,
+    func presentationController(forPresented presented: UIViewController,
+                                presenting: UIViewController?,
                                 source: UIViewController) -> UIPresentationController? {
         return DimmingPresentationController(presentedViewController: presented, presenting: presenting)
     }
 
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return SlideOutAnimationController()
+        switch dismissStyle {
+        case .slide:
+            return SlideOutAnimationController()
+        case .fade:
+            return FadeOutAnimationController()
+        }
     }
 }
