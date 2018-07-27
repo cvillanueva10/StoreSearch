@@ -40,25 +40,26 @@ class DetailViewController: UIViewController {
         let label = UILabel()
         label.setContentHuggingPriority(.init(249), for: .vertical)
         label.font = UIFont.preferredFont(forTextStyle: .headline)
+        label.numberOfLines = 0
         return label
     }()
     let artistNameLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.font = UIFont.preferredFont(forTextStyle: .subheadline)
         return label
     }()
     let typeLabel: UILabel = {
         let label = UILabel()
         label.text = "Type: "
         label.setContentHuggingPriority(.init(999), for: .vertical)
-        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.font = UIFont.preferredFont(forTextStyle: .caption1)
         label.textColor = .lightGray
         return label
     }()
     let typeValueLabel: UILabel = {
         let label = UILabel()
         label.setContentHuggingPriority(.init(999), for: .vertical)
-        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.font = UIFont.preferredFont(forTextStyle: .caption1)
         return label
     }()
     let typeStackView: UIStackView = {
@@ -70,13 +71,14 @@ class DetailViewController: UIViewController {
     let genreLabel: UILabel = {
         let label = UILabel()
         label.text = "Genre: "
-        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.setContentHuggingPriority(.init(999), for: .vertical)
+        label.font = UIFont.preferredFont(forTextStyle: .caption1)
         label.textColor = .lightGray
         return label
     }()
     let genreValueLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.font = UIFont.preferredFont(forTextStyle: .caption1)
         return label
     }()
     let genreStackView: UIStackView = {
@@ -88,7 +90,7 @@ class DetailViewController: UIViewController {
     let priceButton: UIButton = {
         let button = UIButton(type: .system)
         let attributedTitle = NSAttributedString(string: "$9.99", attributes: [
-            NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 20)
+            NSAttributedStringKey.font: UIFont.preferredFont(forTextStyle: .caption1)
             ])
         button.setBackgroundImage(#imageLiteral(resourceName: "PriceButton"), for: .normal)
         button.setAttributedTitle(attributedTitle, for: .normal)
@@ -167,7 +169,6 @@ class DetailViewController: UIViewController {
     }
 
     func setupUI() {
-        view.backgroundColor = UIColor(white: 0, alpha: 0.5)
         view.tintColor = UIColor(red: 20/255, green: 160/255, blue: 160/255, alpha: 1)
         view.addSubview(popupView)
         let dismissGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleDismiss))
@@ -177,11 +178,8 @@ class DetailViewController: UIViewController {
         popupView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         popupView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
         popupView.widthAnchor.constraint(equalToConstant: 240).isActive = true
-        popupView.heightAnchor.constraint(equalToConstant: 240).isActive = true
+        popupView.heightAnchor.constraint(greaterThanOrEqualToConstant: 240).isActive = true
         popupView.layer.cornerRadius = 10
-        popupView.addSubview(closeButton)
-        closeButton.topAnchor.constraint(equalTo: popupView.topAnchor, constant: 2).isActive = true
-        closeButton.leadingAnchor.constraint(equalTo: popupView.leadingAnchor, constant: 4).isActive = true
         thumbnailImageStackView.addArrangedSubview(thumbnailImageView)
         typeStackView.addArrangedSubview(typeLabel)
         typeStackView.addArrangedSubview(typeValueLabel)
@@ -200,6 +198,7 @@ class DetailViewController: UIViewController {
         mainStackView.trailingAnchor.constraint(equalTo: popupView.trailingAnchor, constant: -8).isActive = true
         mainStackView.bottomAnchor.constraint(equalTo: popupView.bottomAnchor, constant: -8).isActive = true
         // override intrinsic sizes
+        genreLabel.lastBaselineAnchor.constraint(equalTo: genreValueLabel.lastBaselineAnchor).isActive = true
         thumbnailImageView.heightAnchor.constraint(equalToConstant: 100).isActive = true
         thumbnailImageView.widthAnchor.constraint(equalToConstant: 100).isActive = true
         thumbnailImageStackView.widthAnchor.constraint(equalTo: mainStackView.widthAnchor).isActive = true
@@ -208,6 +207,9 @@ class DetailViewController: UIViewController {
         priceButton.contentEdgeInsets = UIEdgeInsetsMake(0, 4, 0, 4)
         closeButton.addTarget(self, action: #selector(handleDismiss), for: .touchUpInside)
         priceButton.addTarget(self, action: #selector(openInStore), for: .touchUpInside)
+        popupView.addSubview(closeButton)
+        closeButton.topAnchor.constraint(equalTo: popupView.topAnchor, constant: 2).isActive = true
+        closeButton.leadingAnchor.constraint(equalTo: popupView.leadingAnchor, constant: 4).isActive = true
     }
 
     @objc private func openInStore() {
@@ -231,8 +233,17 @@ extension DetailViewController: UIGestureRecognizerDelegate {
 // MARK: - transitioning delegates
 
 extension DetailViewController: UIViewControllerTransitioningDelegate {
+
+    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return BounceAnimationController()
+    }
+    
     func presentationController(forPresented presented: UIViewController, presenting: UIViewController?,
                                 source: UIViewController) -> UIPresentationController? {
         return DimmingPresentationController(presentedViewController: presented, presenting: presenting)
+    }
+
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return SlideOutAnimationController()
     }
 }

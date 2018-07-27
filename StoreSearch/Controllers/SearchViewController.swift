@@ -50,6 +50,13 @@ class SearchViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        NotificationCenter.default.addObserver(forName: .UIContentSizeCategoryDidChange,
+                                               object: .none,
+                                               queue: OperationQueue.main) { [weak self] _ in
+                                                self?.searchTableView.reloadData()
+        }
+        searchTableView.rowHeight = UITableViewAutomaticDimension
+        searchTableView.estimatedRowHeight = 80
         setupUI()
     }
 
@@ -186,9 +193,9 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
         return (searchResults.count == 0 || isLoading) ? nil : indexPath
     }
 
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 80
-    }
+//    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+//        return 80
+//    }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if isLoading {

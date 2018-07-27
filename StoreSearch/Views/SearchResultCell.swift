@@ -15,12 +15,14 @@ class SearchResultCell: UITableViewCell {
     let topLabel: UILabel = {
         let label = UILabel()
         label.text = "Name"
+        label.numberOfLines = 0
         label.font = .preferredFont(forTextStyle: .title3)
         return label
     }()
     let bottomLabel: UILabel = {
         let label = UILabel()
         label.text = "Artist Name"
+        label.numberOfLines = 0
         label.font = .preferredFont(forTextStyle: .body)
         label.textColor = UIColor.init(white: 0, alpha: 0.5)
         return label
