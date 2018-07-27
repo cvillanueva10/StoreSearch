@@ -39,13 +39,11 @@ class DetailViewController: UIViewController {
     let nameLabel: UILabel = {
         let label = UILabel()
         label.setContentHuggingPriority(.init(249), for: .vertical)
-        label.text = "Name"
         label.font = UIFont.preferredFont(forTextStyle: .headline)
         return label
     }()
     let artistNameLabel: UILabel = {
         let label = UILabel()
-        label.text = "Artist Name"
         label.font = UIFont.preferredFont(forTextStyle: .body)
         return label
     }()
@@ -59,7 +57,6 @@ class DetailViewController: UIViewController {
     }()
     let typeValueLabel: UILabel = {
         let label = UILabel()
-        label.text = "Type Value"
         label.setContentHuggingPriority(.init(999), for: .vertical)
         label.font = UIFont.preferredFont(forTextStyle: .body)
         return label
@@ -79,7 +76,6 @@ class DetailViewController: UIViewController {
     }()
     let genreValueLabel: UILabel = {
         let label = UILabel()
-        label.text = "Genre Value"
         label.font = UIFont.preferredFont(forTextStyle: .body)
         return label
     }()
@@ -94,6 +90,7 @@ class DetailViewController: UIViewController {
         let attributedTitle = NSAttributedString(string: "$9.99", attributes: [
             NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 20)
             ])
+        button.setBackgroundImage(#imageLiteral(resourceName: "PriceButton"), for: .normal)
         button.setAttributedTitle(attributedTitle, for: .normal)
         return button
     }()
@@ -101,33 +98,90 @@ class DetailViewController: UIViewController {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.alignment = .trailing
-//        stackView.distribution = .fillProportionally
         return stackView
     }()
     let mainStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.distribution = .fill
-        stackView.spacing = 8
+        stackView.spacing = 4
         stackView.alignment = .leading
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
+    var searchResult: SearchResult? {
+        didSet {
+            if let searchResult = searchResult {
+                updateUI(with: searchResult)
+            }
+        }
+    }
+    var downloadTask: URLSessionDownloadTask?
 
     // MARK: - lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupUI()
+    }
+
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        modalPresentationStyle = .custom
+        transitioningDelegate = self
+    }
+
+    deinit {
+        print("Deinit")
+        downloadTask?.cancel()
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    func updateUI(with searchResult: SearchResult) {
+        if let url = URL(string: searchResult.imageLarge) {
+            downloadTask = thumbnailImageView.loadImage(url: url)
+        }
+        nameLabel.text = searchResult.name
+        artistNameLabel.text = searchResult.artistName
+        typeValueLabel.text = searchResult.type
+        genreValueLabel.text = searchResult.genre
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = searchResult.currency
+        let priceText: String
+        if searchResult.price == 0 {
+            priceText = "Free"
+        } else if let text = formatter.string(from: searchResult.price as NSNumber) {
+            priceText = text
+        } else {
+            priceText = ""
+        }
+        let attributedTitle = NSAttributedString(string: priceText, attributes: [
+            NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 20)
+            ])
+        priceButton.setAttributedTitle(attributedTitle, for: .normal)
+        priceButton.setTitle(priceText, for: .normal)
+    }
+
+    func setupUI() {
         view.backgroundColor = UIColor(white: 0, alpha: 0.5)
+        view.tintColor = UIColor(red: 20/255, green: 160/255, blue: 160/255, alpha: 1)
         view.addSubview(popupView)
+        let dismissGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleDismiss))
+        dismissGestureRecognizer.cancelsTouchesInView = false
+        dismissGestureRecognizer.delegate = self
+        view.addGestureRecognizer(dismissGestureRecognizer)
         popupView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         popupView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-        popupView.widthAnchor.constraint(equalToConstant: 280).isActive = true
-        popupView.heightAnchor.constraint(equalToConstant: 280).isActive = true
+        popupView.widthAnchor.constraint(equalToConstant: 240).isActive = true
+        popupView.heightAnchor.constraint(equalToConstant: 240).isActive = true
+        popupView.layer.cornerRadius = 10
         popupView.addSubview(closeButton)
         closeButton.topAnchor.constraint(equalTo: popupView.topAnchor, constant: 2).isActive = true
         closeButton.leadingAnchor.constraint(equalTo: popupView.leadingAnchor, constant: 4).isActive = true
-        closeButton.addTarget(self, action: #selector(handleDismiss), for: .touchUpInside)
         thumbnailImageStackView.addArrangedSubview(thumbnailImageView)
         typeStackView.addArrangedSubview(typeLabel)
         typeStackView.addArrangedSubview(typeValueLabel)
@@ -141,28 +195,25 @@ class DetailViewController: UIViewController {
         mainStackView.addArrangedSubview(genreStackView)
         mainStackView.addArrangedSubview(priceStackView)
         popupView.addSubview(mainStackView)
-        mainStackView.topAnchor.constraint(equalTo: closeButton.bottomAnchor, constant: 4).isActive = true
+        mainStackView.topAnchor.constraint(equalTo: popupView.topAnchor, constant: 8).isActive = true
         mainStackView.leadingAnchor.constraint(equalTo: popupView.leadingAnchor, constant: 8).isActive = true
         mainStackView.trailingAnchor.constraint(equalTo: popupView.trailingAnchor, constant: -8).isActive = true
-        mainStackView.bottomAnchor.constraint(equalTo: popupView.bottomAnchor, constant: -4).isActive = true
+        mainStackView.bottomAnchor.constraint(equalTo: popupView.bottomAnchor, constant: -8).isActive = true
+        // override intrinsic sizes
         thumbnailImageView.heightAnchor.constraint(equalToConstant: 100).isActive = true
         thumbnailImageView.widthAnchor.constraint(equalToConstant: 100).isActive = true
         thumbnailImageStackView.widthAnchor.constraint(equalTo: mainStackView.widthAnchor).isActive = true
         priceStackView.widthAnchor.constraint(equalTo: mainStackView.widthAnchor).isActive = true
+        priceButton.heightAnchor.constraint(equalToConstant: 24).isActive = true
+        priceButton.contentEdgeInsets = UIEdgeInsetsMake(0, 4, 0, 4)
+        closeButton.addTarget(self, action: #selector(handleDismiss), for: .touchUpInside)
+        priceButton.addTarget(self, action: #selector(openInStore), for: .touchUpInside)
     }
 
-    override func viewDidAppear(_ animated: Bool) {
-        print(123)
-    }
-
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        modalPresentationStyle = .custom
-        transitioningDelegate = self
-    }
-
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    @objc private func openInStore() {
+        if let storeUrl = searchResult?.storeUrl, let url = URL(string: storeUrl) {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        }
     }
 
     @objc private func handleDismiss() {
@@ -170,7 +221,14 @@ class DetailViewController: UIViewController {
     }
 }
 
-// MARK: - transitioning delegate
+// MARK: - gesture recognizer delegates
+extension DetailViewController: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        return touch.view === self.view
+    }
+}
+
+// MARK: - transitioning delegates
 
 extension DetailViewController: UIViewControllerTransitioningDelegate {
     func presentationController(forPresented presented: UIViewController, presenting: UIViewController?,

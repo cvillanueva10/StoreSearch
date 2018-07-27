@@ -70,7 +70,7 @@ class SearchResultCell: UITableViewCell {
         if result.artistName.isEmpty {
             bottomLabel.text = "Unknown"
         } else {
-            bottomLabel.text = "\(result.artistName) (\(result.type)"
+            bottomLabel.text = "\(result.artistName) (\(result.type))"
         }
         if let smallUrl = URL(string: result.imageSmall) {
             downloadTask = thumbnailImageView.loadImage(url: smallUrl)

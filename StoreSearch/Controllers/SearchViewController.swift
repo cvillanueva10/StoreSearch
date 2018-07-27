@@ -178,6 +178,7 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let detailViewController = DetailViewController()
+        detailViewController.searchResult = searchResults[indexPath.item]
         present(detailViewController, animated: true, completion: nil)
     }
 
