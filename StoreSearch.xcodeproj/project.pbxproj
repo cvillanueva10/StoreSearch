@@ -77,10 +77,10 @@
 			isa = PBXGroup;
 			children = (
 				5696DFCF20FF076B009DEC6D /* AppDelegate.swift */,
+				5696DFE721030068009DEC6D /* Extensions.swift */,
 				5696DFE921030220009DEC6D /* Models */,
 				5696DFEA21030225009DEC6D /* Views */,
 				5696DFEB21030232009DEC6D /* Controllers */,
-				5696DFE721030068009DEC6D /* Extensions.swift */,
 				5696DFD620FF076E009DEC6D /* Assets.xcassets */,
 				5696DFD820FF076E009DEC6D /* LaunchScreen.storyboard */,
 				5696DFDB20FF076E009DEC6D /* Info.plist */,
@@ -99,10 +99,10 @@
 		5696DFEA21030225009DEC6D /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				56A8AF83210B99D5009147E7 /* GradientView.swift */,
 				5696DFEC2105254C009DEC6D /* LoadingCell.swift */,
 				5696DFE52102FE57009DEC6D /* NothingFoundCell.swift */,
 				5696DFE32102EBD3009DEC6D /* SearchResultCell.swift */,
-				56A8AF83210B99D5009147E7 /* GradientView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -110,13 +110,13 @@
 		5696DFEB21030232009DEC6D /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				5696DFD120FF076B009DEC6D /* SearchViewController.swift */,
+				56A8AF85210B9CF1009147E7 /* BounceAnimationController.swift */,
 				5696DFF02106190A009DEC6D /* DetailViewController.swift */,
 				5696DFF22106D7C8009DEC6D /* DimmingPresentationController.swift */,
-				56A8AF85210B9CF1009147E7 /* BounceAnimationController.swift */,
-				56297B58210BA0F500821396 /* SlideOutAnimationController.swift */,
-				56297B5A210BBFDB00821396 /* LandscapeViewController.swift */,
 				56297B5C210BCC2200821396 /* FadeOutAnimationController.swift */,
+				56297B5A210BBFDB00821396 /* LandscapeViewController.swift */,
+				5696DFD120FF076B009DEC6D /* SearchViewController.swift */,
+				56297B58210BA0F500821396 /* SlideOutAnimationController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";

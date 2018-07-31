@@ -150,6 +150,7 @@ class SearchViewController: UIViewController {
         guard landscapeViewController == nil else { return }
         landscapeViewController = LandscapeViewController()
         if let controller = landscapeViewController {
+            controller.searchResults = searchResults
             controller.view.frame = view.bounds
             controller.view.alpha = 0
             view.addSubview(controller.view)
