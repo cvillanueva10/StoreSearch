@@ -73,7 +73,8 @@ class SearchViewController: UIViewController {
 
     @objc func performSearch() {
         guard let searchText = searchBar.text else { return }
-        search.performSearch(for: searchText, category: searchSegmentedControl.selectedSegmentIndex) { (success) in
+        guard let category = Search.Category(rawValue: searchSegmentedControl.selectedSegmentIndex) else { return }
+        search.performSearch(for: searchText, category: category) { (success) in
             if !success {
                 self.showNetworkError()
             } else {
