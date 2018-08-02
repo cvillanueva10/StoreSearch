@@ -41,10 +41,7 @@ class SearchViewController: UIViewController {
     private let loadingCellID = "loading"
     private let searchResultCellID = "searchResults"
     private let nothingFoundCellID = "nothingFound"
-    var searchResults = [SearchResult]()
-    var hasSearched = false
-    var isLoading = false
-    var dataTask: URLSessionDataTask?
+    private let search = Search()
     var landscapeViewController: LandscapeViewController?
 
     // MARK: - lifecycle
@@ -74,66 +71,17 @@ class SearchViewController: UIViewController {
 
     // MARK: - networking
 
-    func iTunesURL(searchTerm: String, category: Int) -> URL {
-        let kind: String
-        switch category {
-        case 1: kind = "musicTrack"
-        case 2: kind = "software"
-        case 3: kind = "ebook"
-        default: kind = ""
-        }
-        let encodedTerm = searchTerm.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
-        let urlString = "https://itunes.apple.com/search?term=\(encodedTerm)&limit=200&entity=\(kind)"
-        return URL(string: urlString)!
-    }
-
-    func parse(data: Data) -> [SearchResult] {
-        do {
-            let decoder = JSONDecoder()
-            let result = try decoder.decode(ResultArray.self, from: data)
-            return result.results
-        } catch {
-            print("JSON Parsing Error: \(error.localizedDescription)")
-            return []
-        }
-    }
-
-
     @objc func performSearch() {
-        guard let searchText = searchBar.text, !searchText.isEmpty else { return }
-        searchBar.resignFirstResponder()
-        dataTask?.cancel()
-        isLoading = true
-        searchTableView.reloadData()
-        hasSearched = true
-        searchResults = []
-        let url = iTunesURL(searchTerm: searchText, category: searchSegmentedControl.selectedSegmentIndex)
-        let session = URLSession.shared
-        dataTask = session.dataTask(with: url) { (data, response, error) in
-            if let error = error as NSError?, error.code == -999 {
-                return
-            } else if let httpResponse = response as? HTTPURLResponse,
-                httpResponse.statusCode == 200 {
-                if let data = data {
-                    self.searchResults = self.parse(data: data)
-                    self.searchResults.sort(by: <)
-                    DispatchQueue.main.async {
-                        self.isLoading = false
-                        self.searchTableView.reloadData()
-                    }
-                    return
-                }
-            } else {
-                print("Failure! \(response!)")
-            }
-            DispatchQueue.main.async {
-                self.hasSearched = false
-                self.isLoading = false
-                self.searchTableView.reloadData()
+        guard let searchText = searchBar.text else { return }
+        search.performSearch(for: searchText, category: searchSegmentedControl.selectedSegmentIndex) { (success) in
+            if !success {
                 self.showNetworkError()
+            } else {
+                self.searchTableView.reloadData()
             }
         }
-        dataTask?.resume()
+        searchTableView.reloadData()
+        searchBar.resignFirstResponder()
     }
 
     func showNetworkError() {
@@ -150,7 +98,7 @@ class SearchViewController: UIViewController {
         guard landscapeViewController == nil else { return }
         landscapeViewController = LandscapeViewController()
         if let controller = landscapeViewController {
-            controller.searchResults = searchResults
+            controller.search = search
             controller.view.frame = view.bounds
             controller.view.alpha = 0
             view.addSubview(controller.view)
@@ -232,42 +180,38 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let detailViewController = DetailViewController()
-        detailViewController.searchResult = searchResults[indexPath.item]
+        detailViewController.searchResult = search.searchResults[indexPath.item]
         present(detailViewController, animated: true, completion: nil)
     }
 
     func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
-        return (searchResults.count == 0 || isLoading) ? nil : indexPath
+        return (search.searchResults.count == 0 || search.isLoading) ? nil : indexPath
     }
 
-//    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-//        return 80
-//    }
-
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if isLoading {
+        if search.isLoading {
             let cell = tableView.dequeueReusableCell(withIdentifier: loadingCellID, for: indexPath)
             let spinner = cell.viewWithTag(100) as! UIActivityIndicatorView
             spinner.startAnimating()
             return cell
         }
-        if searchResults.count == 0 {
+        if search.searchResults.count == 0 {
             return tableView.dequeueReusableCell(withIdentifier: nothingFoundCellID, for: indexPath) 
         } else {
             let cell = searchTableView.dequeueReusableCell(withIdentifier: searchResultCellID) as! SearchResultCell
-            let searchResult = searchResults[indexPath.row]
+            let searchResult = search.searchResults[indexPath.row]
             cell.configure(for: searchResult)
             return cell
         }
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if isLoading {
+        if search.isLoading {
             return 1
-        } else if !hasSearched {
+        } else if !search.hasSearched {
             return 0
         } else {
-            return searchResults.count == 0 ? 1 : searchResults.count
+            return search.searchResults.count == 0 ? 1 : search.searchResults.count
         }
     }
 }

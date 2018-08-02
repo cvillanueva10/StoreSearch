@@ -10,6 +10,7 @@
 		56297B59210BA0F500821396 /* SlideOutAnimationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56297B58210BA0F500821396 /* SlideOutAnimationController.swift */; };
 		56297B5B210BBFDB00821396 /* LandscapeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56297B5A210BBFDB00821396 /* LandscapeViewController.swift */; };
 		56297B5D210BCC2200821396 /* FadeOutAnimationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56297B5C210BCC2200821396 /* FadeOutAnimationController.swift */; };
+		56297B5F2112CE6700821396 /* Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56297B5E2112CE6700821396 /* Search.swift */; };
 		5696DFD020FF076B009DEC6D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5696DFCF20FF076B009DEC6D /* AppDelegate.swift */; };
 		5696DFD220FF076B009DEC6D /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5696DFD120FF076B009DEC6D /* SearchViewController.swift */; };
 		5696DFD720FF076E009DEC6D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5696DFD620FF076E009DEC6D /* Assets.xcassets */; };
@@ -29,6 +30,7 @@
 		56297B58210BA0F500821396 /* SlideOutAnimationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideOutAnimationController.swift; sourceTree = "<group>"; };
 		56297B5A210BBFDB00821396 /* LandscapeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandscapeViewController.swift; sourceTree = "<group>"; };
 		56297B5C210BCC2200821396 /* FadeOutAnimationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FadeOutAnimationController.swift; sourceTree = "<group>"; };
+		56297B5E2112CE6700821396 /* Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Search.swift; sourceTree = "<group>"; };
 		5696DFCC20FF076B009DEC6D /* StoreSearch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StoreSearch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5696DFCF20FF076B009DEC6D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5696DFD120FF076B009DEC6D /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
@@ -78,6 +80,7 @@
 			children = (
 				5696DFCF20FF076B009DEC6D /* AppDelegate.swift */,
 				5696DFE721030068009DEC6D /* Extensions.swift */,
+				56297B5E2112CE6700821396 /* Search.swift */,
 				5696DFE921030220009DEC6D /* Models */,
 				5696DFEA21030225009DEC6D /* Views */,
 				5696DFEB21030232009DEC6D /* Controllers */,
@@ -203,6 +206,7 @@
 				56A8AF86210B9CF1009147E7 /* BounceAnimationController.swift in Sources */,
 				56297B5B210BBFDB00821396 /* LandscapeViewController.swift in Sources */,
 				5696DFF12106190A009DEC6D /* DetailViewController.swift in Sources */,
+				56297B5F2112CE6700821396 /* Search.swift in Sources */,
 				5696DFF32106D7C8009DEC6D /* DimmingPresentationController.swift in Sources */,
 				56297B59210BA0F500821396 /* SlideOutAnimationController.swift in Sources */,
 			);

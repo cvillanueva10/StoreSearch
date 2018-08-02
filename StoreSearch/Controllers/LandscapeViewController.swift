@@ -23,6 +23,7 @@ class LandscapeViewController: UIViewController {
         return pc
     }()
     var searchResults = [SearchResult]()
+    var search: Search!
     private var isFirstTime = true
     private var downloads = [URLSessionDownloadTask]()
 
@@ -43,7 +44,7 @@ class LandscapeViewController: UIViewController {
                                    height: pageControl.frame.size.height)
         if isFirstTime {
             isFirstTime = false
-            tileButtons(searchResults)
+            tileButtons(search.searchResults)
         }
     }
 
