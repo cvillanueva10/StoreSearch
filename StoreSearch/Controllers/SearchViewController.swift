@@ -24,6 +24,7 @@ class SearchViewController: UIViewController {
         control.insertSegment(withTitle: "Music", at: 1, animated: true)
         control.insertSegment(withTitle: "Software", at: 2, animated: true)
         control.insertSegment(withTitle: "E-books", at: 3, animated: true)
+        control.selectedSegmentIndex = 0
         control.translatesAutoresizingMaskIntoConstraints = false
         return control
     }()
@@ -79,6 +80,7 @@ class SearchViewController: UIViewController {
                 self.showNetworkError()
             } else {
                 self.searchTableView.reloadData()
+                self.landscapeViewController?.searchResultsReceived()
             }
         }
         searchTableView.reloadData()
@@ -122,6 +124,9 @@ class SearchViewController: UIViewController {
             controller.willMove(toParentViewController: nil)
             coordinator.animate(alongsideTransition: { (_) in
                 controller.view.alpha = 0
+                if self.presentedViewController != nil {
+                    self.dismiss(animated: true, completion: nil)
+                }
             }) { (_) in
                 controller.view.removeFromSuperview()
                 controller.removeFromParentViewController()
@@ -191,7 +196,6 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
         case .notSearchedYet, .loading, .noResults: return nil
         case .results: return indexPath
         }
-//        return (search.searchResults.count == 0 || search.isLoading) ? nil : indexPath
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -212,14 +216,6 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
             return cell
         }
 
-//        if search.searchResults.count == 0 {
-//            return tableView.dequeueReusableCell(withIdentifier: nothingFoundCellID, for: indexPath)
-//        } else {
-//            let cell = searchTableView.dequeueReusableCell(withIdentifier: searchResultCellID) as! SearchResultCell
-//            let searchResult = search.searchResults[indexPath.row]
-//            cell.configure(for: searchResult)
-//            return cell
-//        }
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

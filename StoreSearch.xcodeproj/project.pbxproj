@@ -80,7 +80,6 @@
 			children = (
 				5696DFCF20FF076B009DEC6D /* AppDelegate.swift */,
 				5696DFE721030068009DEC6D /* Extensions.swift */,
-				56297B5E2112CE6700821396 /* Search.swift */,
 				5696DFE921030220009DEC6D /* Models */,
 				5696DFEA21030225009DEC6D /* Views */,
 				5696DFEB21030232009DEC6D /* Controllers */,
@@ -94,6 +93,7 @@
 		5696DFE921030220009DEC6D /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				56297B5E2112CE6700821396 /* Search.swift */,
 				5696DFE121000A33009DEC6D /* SearchResult.swift */,
 			);
 			path = Models;

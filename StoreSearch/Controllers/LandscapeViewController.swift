@@ -10,6 +10,8 @@ import UIKit
 
 class LandscapeViewController: UIViewController {
 
+    // MARK: - properties
+
     let scrollView: UIScrollView = {
         let sv = UIScrollView()
         sv.backgroundColor = UIColor(patternImage: #imageLiteral(resourceName: "LandscapeBackground"))
@@ -26,6 +28,8 @@ class LandscapeViewController: UIViewController {
     var search: Search!
     private var isFirstTime = true
     private var downloads = [URLSessionDownloadTask]()
+
+    // MARK: - lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -48,9 +52,9 @@ class LandscapeViewController: UIViewController {
             case .notSearchedYet:
                 break
             case .loading:
-                break
+                showSpinner()
             case .noResults:
-                break
+                showNothingFoundLabel()
             case .results(let list):
                 tileButtons(list)
             }
@@ -61,6 +65,20 @@ class LandscapeViewController: UIViewController {
         print("deinit \(self)")
         for task in downloads {
             task.cancel()
+        }
+    }
+
+    // MARK: - networking
+
+    func searchResultsReceived() {
+        hideSpinner()
+        switch search.state {
+        case .notSearchedYet, .loading:
+            break
+        case .noResults:
+            showNothingFoundLabel()
+        case .results(let list):
+            tileButtons(list)
         }
     }
 
@@ -81,6 +99,50 @@ class LandscapeViewController: UIViewController {
         task.resume()
         downloads.append(task)
     }
+
+    // MARK: - actions
+
+    @objc func tileButtonPressed(_ sender: UIButton) {
+        guard case .results(let list) = search.state else { return }
+        let detailViewController = DetailViewController()
+        let searchResult = list[sender.tag - 2000]
+        detailViewController.searchResult = searchResult
+        present(detailViewController, animated: true, completion: nil)
+    }
+
+    // MARK: - UI (activity indicator, no results label, tiles)
+
+    private func hideSpinner() {
+        view.viewWithTag(1000)?.removeFromSuperview()
+    }
+
+    private func showSpinner() {
+        let spinner = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+        spinner.center = CGPoint(x: scrollView.bounds.midX + 0.5,
+                                 y: scrollView.bounds.midY + 0.5)
+        spinner.tag = 1000
+        view.addSubview(spinner)
+        spinner.startAnimating()
+    }
+
+    private func showNothingFoundLabel() {
+        let label = UILabel(frame: CGRect.zero)
+        label.text = "Nothing Found"
+        label.textColor = UIColor.white
+        label.backgroundColor = UIColor.clear
+
+        label.sizeToFit()
+
+        var rect = label.frame
+        rect.size.width = ceil(rect.size.width/2) * 2    // make even
+        rect.size.height = ceil(rect.size.height/2) * 2  // make even
+        label.frame = rect
+
+        label.center = CGPoint(x: scrollView.bounds.midX,
+                               y: scrollView.bounds.midY)
+        view.addSubview(label)
+    }
+
 
     private func tileButtons(_ searchResults: [SearchResult]) {
         var columnsPerPage = 5
@@ -120,6 +182,8 @@ class LandscapeViewController: UIViewController {
         for (index, result) in searchResults.enumerated() {
             let button = UIButton(type: .custom)
             button.setBackgroundImage(UIImage(named: "LandscapeButton"), for: .normal)
+            button.tag = 2000 + index
+            button.addTarget(self, action: #selector(tileButtonPressed), for: .touchUpInside)
             downloadImage(for: result, andPlaceOn: button)
             button.frame = CGRect(x: x + paddingHorizontal,
                                   y: marginY + CGFloat(row) * itemHeight + paddingVertical,
@@ -146,6 +210,8 @@ class LandscapeViewController: UIViewController {
         print("Number of pages: \(numPages)")
     }
 }
+
+// MARK: - scroll view delegates
 
 extension LandscapeViewController: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
