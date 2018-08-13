@@ -106,9 +106,9 @@ class LandscapeViewController: UIViewController {
         guard case .results(let list) = search.state else { return }
         let detailViewController = DetailViewController()
         let searchResult = list[sender.tag - 2000]
-        detailViewController.searchResult = searchResult
         detailViewController.isPopup = true
         present(detailViewController, animated: true, completion: nil)
+        detailViewController.searchResult = searchResult
     }
 
     // MARK: - UI (activity indicator, no results label, tiles)
