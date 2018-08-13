@@ -7,8 +7,9 @@
 //
 
 import UIKit
+import MessageUI
 
-class DetailViewController: UIViewController {
+class DetailViewController: UIViewController, UINavigationControllerDelegate {
 
     enum AnimationStyle {
         case slide
@@ -30,7 +31,6 @@ class DetailViewController: UIViewController {
     let thumbnailImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.setContentHuggingPriority(.init(999), for: .horizontal)
-        imageView.backgroundColor = .red
         return imageView
     }()
     let thumbnailImageStackView: UIStackView = {
@@ -110,33 +110,60 @@ class DetailViewController: UIViewController {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.distribution = .fill
-        stackView.spacing = 4
         stackView.alignment = .leading
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
-    var searchResult: SearchResult? {
+    var searchResult: SearchResult! {
         didSet {
-            if let searchResult = searchResult {
+            if isViewLoaded {
                 updateUI(with: searchResult)
             }
         }
     }
+    var isIpadSizeClass: Bool {
+        let rootTraitCollection = view.window?.rootViewController?.traitCollection
+        return rootTraitCollection?.horizontalSizeClass == .regular && rootTraitCollection?.verticalSizeClass == .regular
+    }
+    var isIphonePlusSizeClass: Bool {
+        let rootTraitCollection = view.window?.rootViewController?.traitCollection
+        return rootTraitCollection?.horizontalSizeClass == .regular && rootTraitCollection?.verticalSizeClass == .compact
+    }
     var downloadTask: URLSessionDownloadTask?
     var dismissStyle = AnimationStyle.fade
+    var isPopup = false
+
+    var popupWidth: CGFloat {
+        return isIpadSizeClass ? 500 : 240
+    }
+    var thumbnailImageViewSize: CGFloat {
+        return isIpadSizeClass ? 180 : 100
+    }
+    var stackViewVerticalSpacing: CGFloat {
+        return isIpadSizeClass ? 16 : 4
+    }
+    var topMarginPadding: CGFloat {
+        return isIpadSizeClass ? 20 : 8
+    }
+    var priceButtonSpacing: CGFloat {
+        return isIpadSizeClass ? 20 : 8
+    }
 
 
     // MARK: - lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
     }
 
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         modalPresentationStyle = .custom
         transitioningDelegate = self
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+          setupUI()
     }
 
     deinit {
@@ -146,6 +173,8 @@ class DetailViewController: UIViewController {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    // MARK: - UI
 
     func updateUI(with searchResult: SearchResult) {
         if let url = URL(string: searchResult.imageLarge) {
@@ -171,18 +200,29 @@ class DetailViewController: UIViewController {
             ])
         priceButton.setAttributedTitle(attributedTitle, for: .normal)
         priceButton.setTitle(priceText, for: .normal)
+        popupView.isHidden = false
     }
 
     func setupUI() {
+        title = "Store Search"
+        if isPopup {
+            let dismissGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleDismiss))
+            dismissGestureRecognizer.cancelsTouchesInView = false
+            dismissGestureRecognizer.delegate = self
+            view.addGestureRecognizer(dismissGestureRecognizer)
+            view.backgroundColor = .clear
+        } else {
+            view.backgroundColor = UIColor(patternImage: #imageLiteral(resourceName: "LandscapeBackground"))
+            popupView.isHidden = true
+        }
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action,
+                                                            target: self,
+                                                            action: #selector(showPopoverMenu))
         view.tintColor = UIColor(red: 20/255, green: 160/255, blue: 160/255, alpha: 1)
         view.addSubview(popupView)
-        let dismissGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleDismiss))
-        dismissGestureRecognizer.cancelsTouchesInView = false
-        dismissGestureRecognizer.delegate = self
-        view.addGestureRecognizer(dismissGestureRecognizer)
         popupView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         popupView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-        popupView.widthAnchor.constraint(equalToConstant: 240).isActive = true
+        popupView.widthAnchor.constraint(greaterThanOrEqualToConstant: popupWidth).isActive = true
         popupView.heightAnchor.constraint(greaterThanOrEqualToConstant: 240).isActive = true
         popupView.layer.cornerRadius = 10
         thumbnailImageStackView.addArrangedSubview(thumbnailImageView)
@@ -198,23 +238,39 @@ class DetailViewController: UIViewController {
         mainStackView.addArrangedSubview(genreStackView)
         mainStackView.addArrangedSubview(priceStackView)
         popupView.addSubview(mainStackView)
-        mainStackView.topAnchor.constraint(equalTo: popupView.topAnchor, constant: 8).isActive = true
+        mainStackView.topAnchor.constraint(equalTo: popupView.topAnchor, constant: topMarginPadding).isActive = true
         mainStackView.leadingAnchor.constraint(equalTo: popupView.leadingAnchor, constant: 8).isActive = true
         mainStackView.trailingAnchor.constraint(equalTo: popupView.trailingAnchor, constant: -8).isActive = true
         mainStackView.bottomAnchor.constraint(equalTo: popupView.bottomAnchor, constant: -8).isActive = true
+        mainStackView.spacing = stackViewVerticalSpacing
         // override intrinsic sizes
         genreLabel.lastBaselineAnchor.constraint(equalTo: genreValueLabel.lastBaselineAnchor).isActive = true
-        thumbnailImageView.heightAnchor.constraint(equalToConstant: 100).isActive = true
-        thumbnailImageView.widthAnchor.constraint(equalToConstant: 100).isActive = true
+        thumbnailImageView.heightAnchor.constraint(equalToConstant: thumbnailImageViewSize).isActive = true
+        thumbnailImageView.widthAnchor.constraint(equalToConstant: thumbnailImageViewSize).isActive = true
         thumbnailImageStackView.widthAnchor.constraint(equalTo: mainStackView.widthAnchor).isActive = true
         priceStackView.widthAnchor.constraint(equalTo: mainStackView.widthAnchor).isActive = true
         priceButton.heightAnchor.constraint(equalToConstant: 24).isActive = true
-        priceButton.contentEdgeInsets = UIEdgeInsetsMake(0, 4, 0, 4)
+        priceButton.contentEdgeInsets = UIEdgeInsetsMake(0, priceButtonSpacing, 0, priceButtonSpacing)
         closeButton.addTarget(self, action: #selector(handleDismiss), for: .touchUpInside)
         priceButton.addTarget(self, action: #selector(openInStore), for: .touchUpInside)
-        popupView.addSubview(closeButton)
-        closeButton.topAnchor.constraint(equalTo: popupView.topAnchor, constant: 2).isActive = true
-        closeButton.leadingAnchor.constraint(equalTo: popupView.leadingAnchor, constant: 4).isActive = true
+        if !isIpadSizeClass && !isIphonePlusSizeClass {
+            popupView.addSubview(closeButton)
+            closeButton.topAnchor.constraint(equalTo: popupView.topAnchor, constant: 2).isActive = true
+            closeButton.leadingAnchor.constraint(equalTo: popupView.leadingAnchor, constant: 4).isActive = true
+        }
+    }
+
+    // MARK: - actions
+
+    @objc private func showPopoverMenu(_ sender: UIBarButtonItem) {
+        let popoverMenuViewController = PopoverMenuViewController(style: .grouped)
+        popoverMenuViewController.modalPresentationStyle = .popover
+        popoverMenuViewController.popoverPresentationController?.delegate = self
+        popoverMenuViewController.popoverPresentationController?.sourceView = view
+        popoverMenuViewController.popoverPresentationController?.barButtonItem = sender
+        popoverMenuViewController.preferredContentSize = CGSize(width: 320, height: 204)
+        popoverMenuViewController.delegate = self
+        present(popoverMenuViewController, animated: true, completion: nil)
     }
 
     @objc private func openInStore() {
@@ -261,3 +317,38 @@ extension DetailViewController: UIViewControllerTransitioningDelegate {
         }
     }
 }
+
+// MARK: - popover delegate
+
+extension DetailViewController: PopoverMenuViewControllerDelegate {
+
+    func menuViewControllerSendEmail(_ controller: PopoverMenuViewController) {
+        dismiss(animated: true) {
+            if MFMailComposeViewController.canSendMail() {
+                let controller = MFMailComposeViewController()
+                controller.delegate = self
+                controller.setSubject(NSLocalizedString("Support Request",
+                                                        comment: "Email subject"))
+                controller.setToRecipients(["your@email-address-here.com"])
+                self.present(controller, animated: true, completion: nil)
+            }
+        }
+    }
+}
+
+// MARK: - mail composter delegate
+
+extension DetailViewController: MFMailComposeViewControllerDelegate {
+    func mailComposeController(_ controller:
+        MFMailComposeViewController, didFinishWith result:
+        MFMailComposeResult, error: Error?) {
+        dismiss(animated: true, completion: nil)
+    }
+}
+
+extension DetailViewController: UIPopoverPresentationControllerDelegate {
+}
+
+
+
+

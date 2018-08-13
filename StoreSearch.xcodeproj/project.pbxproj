@@ -24,6 +24,8 @@
 		5696DFF32106D7C8009DEC6D /* DimmingPresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5696DFF22106D7C8009DEC6D /* DimmingPresentationController.swift */; };
 		56A8AF84210B99D5009147E7 /* GradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A8AF83210B99D5009147E7 /* GradientView.swift */; };
 		56A8AF86210B9CF1009147E7 /* BounceAnimationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A8AF85210B9CF1009147E7 /* BounceAnimationController.swift */; };
+		56DDA5E5211E2487007EBE40 /* SplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56DDA5E4211E2487007EBE40 /* SplitViewController.swift */; };
+		56DDA5E921214AB1007EBE40 /* PopoverMenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56DDA5E821214AB1007EBE40 /* PopoverMenuViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +48,10 @@
 		5696DFF22106D7C8009DEC6D /* DimmingPresentationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DimmingPresentationController.swift; sourceTree = "<group>"; };
 		56A8AF83210B99D5009147E7 /* GradientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientView.swift; sourceTree = "<group>"; };
 		56A8AF85210B9CF1009147E7 /* BounceAnimationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BounceAnimationController.swift; sourceTree = "<group>"; };
+		56DDA5E4211E2487007EBE40 /* SplitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitViewController.swift; sourceTree = "<group>"; };
+		56DDA5E621213435007EBE40 /* fil-PH */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "fil-PH"; path = "fil-PH.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
+		56DDA5E72121354C007EBE40 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		56DDA5E821214AB1007EBE40 /* PopoverMenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverMenuViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,6 +126,8 @@
 				56297B5A210BBFDB00821396 /* LandscapeViewController.swift */,
 				5696DFD120FF076B009DEC6D /* SearchViewController.swift */,
 				56297B58210BA0F500821396 /* SlideOutAnimationController.swift */,
+				56DDA5E4211E2487007EBE40 /* SplitViewController.swift */,
+				56DDA5E821214AB1007EBE40 /* PopoverMenuViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -209,6 +217,8 @@
 				56297B5F2112CE6700821396 /* Search.swift in Sources */,
 				5696DFF32106D7C8009DEC6D /* DimmingPresentationController.swift in Sources */,
 				56297B59210BA0F500821396 /* SlideOutAnimationController.swift in Sources */,
+				56DDA5E5211E2487007EBE40 /* SplitViewController.swift in Sources */,
+				56DDA5E921214AB1007EBE40 /* PopoverMenuViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -219,6 +229,8 @@
 			isa = PBXVariantGroup;
 			children = (
 				5696DFD920FF076E009DEC6D /* Base */,
+				56DDA5E621213435007EBE40 /* fil-PH */,
+				56DDA5E72121354C007EBE40 /* nl */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
@@ -230,6 +242,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -290,6 +303,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";

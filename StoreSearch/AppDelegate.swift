@@ -13,22 +13,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-    // MARK: - helper
-    func customizeAppearance() {
-        UISearchBar.appearance().barTintColor = .barTintColor
-        window?.tintColor = .tintColor
-    }
-
+    let splitViewController = UISplitViewController()
+    let searchViewController = SearchViewController()
+    let detailViewController = DetailViewController()
 
     // MARK: - entry
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.makeKeyAndVisible()
-        let searchViewController = SearchViewController()
-        window?.rootViewController = searchViewController
+        let detailNavigationController = UINavigationController(rootViewController: detailViewController)
+        searchViewController.splitViewDetail = detailViewController
+        splitViewController.viewControllers = [searchViewController, detailNavigationController]
+        window?.rootViewController = splitViewController
         customizeAppearance()
         return true
+    }
+
+    // MARK: - helper
+    func customizeAppearance() {
+        detailViewController.navigationItem.leftBarButtonItem = splitViewController.displayModeButtonItem
+        UISearchBar.appearance().barTintColor = .barTintColor
+        window?.tintColor = .tintColor
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
